@@ -44,14 +44,6 @@ taskList.addEventListener('click', function(event) {
     }
 });
 
-document.addEventListener('click', function(event){
-    if (editModeOn && event.target.id != 'editingInput') {
-        console.log(`editmode was ${editModeOn}, now it's false`);
-        editModeOn = false;
-        displayTaskList();
-    }
-})
-
 function editItem(itemId) {    
     if (editModeOn) {
         return;
@@ -59,20 +51,32 @@ function editItem(itemId) {
 
     let currentValue = tasksArr[itemId].value,
         currentId = '#item_' + itemId,
-        currentLabel = taskList.querySelector(currentId).nextElementSibling;
+        currentLabel = taskList.querySelector(currentId).nextElementSibling;        
+
     currentLabel.innerHTML = `<input id="editingInput" class="editing-input" type="text" value="${currentValue}">`;
     let editingInput = taskList.querySelector('#editingInput');
     editingInput.focus();
     editingInput.selectionStart = editingInput.value.length;
     
-    editingInput.addEventListener('change', function(){
-        tasksArr[itemId].value = editingInput.value;
-        refreshAfterTimeOut(0);
-    });
-
     setTimeout(() => {
         editModeOn = true;
-    }, 10);
+        document.addEventListener('click', exitFromEditItem);        
+    }, 30);
+
+    function exitFromEditItem(event) {
+        if (event.target.id != 'editingInput') {
+            console.log(`editmode was ${editModeOn}, now it's false`);
+            editModeOn = false;
+            document.removeEventListener('click', exitFromEditItem);
+            
+            console.log(`editing input value: ${editingInput}`);
+            if (editingInput.value != '') {
+                tasksArr[itemId].value = editingInput.value;
+            }
+            
+            refreshAfterTimeOut(30);
+        }    
+    }
 }
 
 function changeWithPrevious(itemId) {
@@ -197,7 +201,10 @@ function displayTaskList() {
                     </button>
                     <button class="list-btn delete-btn">
                     </button>
-                </div>
+                </div>                
+                <button class="mobile-btn">
+                    <span class="mobile-btn-text">&#9881;</span>
+                </button>
             </li>
             `;
             taskList.innerHTML = taskItem;
