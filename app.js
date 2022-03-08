@@ -163,7 +163,7 @@ function addNewTask() {
 
 function trimValue(value) {
     if (value.length > 25) {
-        return value.substring(0, 25) + '...';
+        return value.substring(0, 20) + '...';
     } else {
         return value;
     }
